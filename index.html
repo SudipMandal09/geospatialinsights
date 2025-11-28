@@ -3,18 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- 7. CSP: Content Security Policy (Allowing specific sources only) -->
+    <!-- CSP: Content Security Policy -->
     <meta http-equiv="Content-Security-Policy" content="
         default-src 'self'; 
-        img-src 'self' https: data:; 
+        img-src 'self' https: data: blob:; 
         style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://unpkg.com; 
         font-src 'self' https://fonts.gstatic.com; 
-        script-src 'self' 'unsafe-inline' https://unpkg.com; 
+        script-src 'self' 'unsafe-inline' https://unpkg.com https://cdnjs.cloudflare.com; 
         connect-src 'self'; 
         object-src 'none'; 
         frame-ancestors 'none';">
     
-    <!-- 8. Security Headers (Meta Equivalents) -->
+    <!-- Security Headers -->
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
     <meta name="referrer" content="strict-origin-when-cross-origin">
 
@@ -25,16 +25,19 @@
     <meta property="og:description" content="Bridging GeoAI and Earth Science.">
     <meta property="og:type" content="website">
 
-    <!-- Fonts: Poppins, Roboto, Fira Code -->
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Poppins:wght@400;600;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
     
-    <!-- 1. SRI: Leaflet CSS (Specific Version with Integrity Hash) -->
+    <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="anonymous" />
     
-    <!-- 1. SRI/Pinning: Lucide Icons (Pinned Version) -->
+    <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@0.292.0/dist/umd/lucide.min.js"></script>
+    
+    <!-- html2pdf Library (Corrected Integrity) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" xintegrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
     <style>
         /* --- 4. OFFICIAL COLOR PALETTE & VARIABLES --- */
@@ -62,27 +65,13 @@
             font-family: var(--font-body);
             line-height: 1.6;
             overflow-x: hidden;
-            
-            /* --- PRIVACY: DISABLE SELECTION --- */
-            -webkit-user-select: none; /* Safari */
-            -moz-user-select: none;    /* Firefox */
-            -ms-user-select: none;     /* IE10+/Edge */
-            user-select: none;         /* Standard */
+            -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none;
         }
 
-        /* --- PRIVACY: DISABLE IMAGE DRAGGING --- */
-        img {
-            pointer-events: none;
-            -webkit-user-drag: none;
-        }
+        img { pointer-events: none; -webkit-user-drag: none; }
 
-        /* --- PRIVACY: DISABLE PRINTING --- */
         @media print {
-            html, body {
-                display: none !important;
-                height: 0;
-                overflow: hidden;
-            }
+            html, body { display: none !important; height: 0; overflow: hidden; }
         }
 
         a { text-decoration: none; color: inherit; transition: var(--transition); }
@@ -101,83 +90,31 @@
         }
 
         .section-padding { padding: 80px 0; }
-        
         .code-font { font-family: var(--font-code); }
-        
         .text-emerald { color: var(--emerald); }
         .text-cyan { color: var(--cyan); }
 
         /* --- BUTTONS --- */
         .btn {
-            display: inline-block;
-            padding: 12px 24px;
-            border-radius: 4px;
-            font-family: var(--font-code);
-            font-size: 14px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: var(--transition);
-            border: none; /* Reset default button border */
+            display: inline-block; padding: 12px 24px; border-radius: 4px;
+            font-family: var(--font-code); font-size: 14px; font-weight: 500;
+            cursor: pointer; transition: var(--transition); border: none;
         }
-
-        .btn-primary {
-            background-color: transparent;
-            color: var(--emerald);
-            border: 1px solid var(--emerald);
-        }
-
-        .btn-primary:hover {
-            background-color: rgba(29, 185, 84, 0.1);
-            transform: translateY(-2px);
-        }
-
-        .btn-filled {
-            background-color: var(--emerald);
-            color: #fff;
-            border: 1px solid var(--emerald);
-        }
-
-        .btn-filled:hover {
-            background-color: var(--emerald-hover);
-            transform: translateY(-2px);
-        }
+        .btn-primary { background-color: transparent; color: var(--emerald); border: 1px solid var(--emerald); }
+        .btn-primary:hover { background-color: rgba(29, 185, 84, 0.1); transform: translateY(-2px); }
+        .btn-filled { background-color: var(--emerald); color: #fff; border: 1px solid var(--emerald); }
+        .btn-filled:hover { background-color: var(--emerald-hover); transform: translateY(-2px); }
 
         /* --- NAVIGATION --- */
         header {
-            background-color: var(--navy);
-            height: 80px;
-            position: fixed;
-            width: 100%;
-            top: 0;
-            z-index: 1000;
+            background-color: var(--navy); height: 80px; position: fixed; width: 100%; top: 0; z-index: 1000;
             box-shadow: 0 4px 20px rgba(0,0,0,0.1);
         }
-
-        nav {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            height: 100%;
-        }
-
-        .logo {
-            font-family: var(--font-code);
-            font-size: 1.5rem;
-            color: var(--emerald);
-            font-weight: 700;
-            letter-spacing: -1px;
-        }
-
+        nav { display: flex; justify-content: space-between; align-items: center; height: 100%; }
+        .logo { font-family: var(--font-code); font-size: 1.5rem; color: var(--emerald); font-weight: 700; letter-spacing: -1px; }
         .nav-links { display: flex; gap: 30px; }
-        
-        .nav-links a {
-            color: var(--gray);
-            font-size: 14px;
-            font-family: var(--font-code);
-        }
-
+        .nav-links a { color: var(--gray); font-size: 14px; font-family: var(--font-code); }
         .nav-links a:hover, .nav-links a.active { color: var(--emerald); }
-
         .mobile-toggle { display: none; color: var(--white); cursor: pointer; }
 
         /* --- HERO SECTION --- */
@@ -185,394 +122,105 @@
             height: 100vh;
             display: flex;
             align-items: center;
-            /* 6. External Image Mitigation: Added no-referrer to body/meta, ensuring privacy */
-            background: linear-gradient(rgba(10, 26, 47, 0.95), rgba(10, 26, 47, 0.9)), 
+            background: linear-gradient(rgba(10, 26, 47, 0.65), rgba(10, 26, 47, 0.65)), 
                         url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&q=80') center/cover;
             color: var(--white);
             padding-top: 80px;
         }
-
         .hero-content { max-width: 800px; }
-        
-        .hero-pre {
-            font-family: var(--font-code);
-            color: var(--emerald);
-            margin-bottom: 20px;
-            display: block;
-        }
-
-        .hero-title {
-            font-size: clamp(40px, 8vw, 70px);
-            line-height: 1.1;
-            color: var(--white);
-            margin-bottom: 20px;
-        }
-
-        .hero-subtitle {
-            font-size: clamp(24px, 4vw, 36px);
-            color: var(--slate);
-            line-height: 1.3;
-            margin-bottom: 30px;
-            font-weight: 500;
-        }
-
-        .hero-desc {
-            max-width: 600px;
-            color: var(--gray);
-            margin-bottom: 40px;
-            font-size: 18px;
-        }
+        .hero-pre { font-family: var(--font-code); color: var(--emerald); margin-bottom: 20px; display: block; }
+        .hero-title { font-size: clamp(40px, 8vw, 70px); line-height: 1.1; color: var(--white); margin-bottom: 20px; }
+        .hero-subtitle { font-size: clamp(24px, 4vw, 36px); color: var(--gray); line-height: 1.3; margin-bottom: 30px; font-weight: 500; }
+        .hero-desc { max-width: 600px; color: #ccc; margin-bottom: 40px; font-size: 18px; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
 
         /* --- SECTION TITLES --- */
-        .section-title {
-            display: flex;
-            align-items: center;
-            font-size: 26px;
-            margin-bottom: 40px;
-            white-space: nowrap;
-        }
+        .section-title { display: flex; align-items: center; font-size: 26px; margin-bottom: 40px; white-space: nowrap; }
+        .section-title::before { content: "0" counter(section) "."; counter-increment: section; margin-right: 10px; color: var(--emerald); font-family: var(--font-code); font-size: 20px; font-weight: 400; }
+        .section-title::after { content: ""; display: block; width: 300px; height: 1px; background-color: var(--navy-light); margin-left: 20px; opacity: 0.3; }
 
-        .section-title::before {
-            content: "0" counter(section) ".";
-            counter-increment: section;
-            margin-right: 10px;
-            color: var(--emerald);
-            font-family: var(--font-code);
-            font-size: 20px;
-            font-weight: 400;
-        }
-
-        .section-title::after {
-            content: "";
-            display: block;
-            width: 300px;
-            height: 1px;
-            background-color: var(--navy-light);
-            margin-left: 20px;
-            opacity: 0.3;
-        }
-
-        /* --- SKILLS GRID --- */
-        .skills-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-        }
-
-        .skill-card {
-            background: #fff;
-            padding: 25px;
-            border-radius: 8px;
+        /* --- GRIDS & CARDS --- */
+        .skills-grid, .cert-grid, .resources-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; }
+        
+        .skill-card, .cert-card, .resource-card {
+            background: #fff; padding: 25px; border-radius: 8px;
             box-shadow: 0 10px 30px -15px rgba(2,12,27,0.1);
-            border-top: 3px solid var(--emerald);
-            transition: var(--transition);
+            border-top: 3px solid var(--emerald); transition: var(--transition);
         }
-
-        .skill-card:hover { transform: translateY(-5px); }
-        
+        .skill-card:hover, .cert-card:hover, .resource-card:hover { transform: translateY(-5px); }
         .skill-icon { color: var(--emerald); margin-bottom: 15px; }
-        
-        .skill-card h3 { font-size: 18px; margin-bottom: 10px; }
-        
-        .skill-tags {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-top: 15px;
-        }
+        .skill-tags { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 15px; }
+        .tag { font-family: var(--font-code); font-size: 12px; background: rgba(0, 194, 255, 0.1); color: var(--navy); padding: 5px 10px; border-radius: 20px; }
 
-        .tag {
-            font-family: var(--font-code);
-            font-size: 12px;
-            background: rgba(0, 194, 255, 0.1);
-            color: var(--navy);
-            padding: 5px 10px;
-            border-radius: 20px;
-        }
+        .cert-card { border-left: 4px solid var(--emerald); border-top: none; }
+        .cert-issuer { font-size: 12px; font-family: var(--font-code); color: var(--slate); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; }
+        .cert-title { font-size: 16px; font-weight: 600; margin-bottom: 10px; color: var(--navy); }
+        .cert-skills { font-size: 13px; color: #666; line-height: 1.5; }
 
         /* --- PROJECTS --- */
-        .project-card {
-            display: grid;
-            grid-template-columns: 1.5fr 1fr;
-            gap: 20px;
-            margin-bottom: 80px;
-            align-items: center;
-        }
-
-        .project-img {
-            position: relative;
-            border-radius: 4px;
-            overflow: hidden;
-            box-shadow: 0 20px 30px -15px rgba(2,12,27,0.3);
-        }
-
-        .project-img img {
-            width: 100%;
-            height: auto;
-            display: block;
-            filter: grayscale(30%);
-            transition: var(--transition);
-        }
-
-        .project-img:hover img { filter: none; }
-
+        .project-card { display: grid; grid-template-columns: 1.5fr 1fr; gap: 20px; margin-bottom: 80px; align-items: center; }
+        .project-img { position: relative; border-radius: 4px; overflow: hidden; box-shadow: 0 20px 30px -15px rgba(2,12,27,0.3); }
+        .project-img img { width: 100%; height: auto; display: block; transition: var(--transition); }
+        /* Removed grayscale filter so image shows in full color */
+        .project-img:hover img { transform: scale(1.03); }
         .project-content { position: relative; z-index: 2; }
-        
-        .project-overline {
-            color: var(--emerald);
-            font-family: var(--font-code);
-            font-size: 13px;
-            margin-bottom: 10px;
-            display: block;
-        }
-
+        .project-overline { color: var(--emerald); font-family: var(--font-code); font-size: 13px; margin-bottom: 10px; display: block; }
         .project-title { margin-bottom: 20px; font-size: 24px; }
+        .project-desc-box { background-color: var(--navy-light); color: var(--gray); padding: 25px; border-radius: 4px; font-size: 15px; margin-bottom: 20px; box-shadow: 0 10px 30px -15px rgba(2,12,27,0.7); }
+        .project-tech { font-family: var(--font-code); font-size: 13px; color: var(--slate); margin-bottom: 20px; display: flex; flex-wrap: wrap; gap: 15px; }
+
+        /* --- MAP & CONTACT --- */
+        #map-container { height: 350px; width: 100%; border-radius: 8px; margin-bottom: 30px; z-index: 1; border: 1px solid var(--gray); }
+        .contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; }
         
-        .project-desc-box {
-            background-color: var(--navy-light);
-            color: var(--gray);
-            padding: 25px;
-            border-radius: 4px;
-            font-size: 15px;
-            margin-bottom: 20px;
-            box-shadow: 0 10px 30px -15px rgba(2,12,27,0.7);
-        }
-
-        .project-tech {
-            font-family: var(--font-code);
-            font-size: 13px;
-            color: var(--slate);
-            margin-bottom: 20px;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 15px;
-        }
-
-        /* --- LEARNING TRACKER --- */
-        .tracker-container {
-            background: var(--white);
-            border-left: 2px solid var(--gray);
-            padding-left: 30px;
-            margin-left: 10px;
-        }
-
-        .tracker-item { position: relative; margin-bottom: 40px; }
-        
-        .tracker-item::before {
-            content: '';
-            position: absolute;
-            left: -37px;
-            top: 5px;
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            background: var(--emerald);
-            border: 2px solid var(--white);
-        }
-
-        .tracker-date {
-            font-family: var(--font-code);
-            font-size: 13px;
-            color: var(--slate);
-        }
-
-        .progress-bar {
-            background: #eee;
-            height: 8px;
-            border-radius: 4px;
-            margin-top: 10px;
-            overflow: hidden;
-        }
-
-        .progress-fill {
-            background: var(--cyan);
-            height: 100%;
-        }
-
-        /* --- RESOURCES & DOWNLOADS --- */
-        .resources-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            margin-top: 20px;
-        }
-
-        .resource-card {
-            border: 1px solid var(--gray);
-            padding: 20px;
-            border-radius: 8px;
-            text-align: center;
-            transition: var(--transition);
-        }
-        
-        .resource-card:hover {
-            border-color: var(--emerald);
-            background-color: #f0fdf4;
-        }
-
-        /* --- LEAFLET MAP & CONTACT --- */
-        #map-container {
-            height: 350px;
-            width: 100%;
-            border-radius: 8px;
-            margin-bottom: 30px;
-            z-index: 1; /* Keep below modal */
-            border: 1px solid var(--gray);
-        }
-        
-        /* CUSTOM MAP MARKERS */
         .india-flag-icon {
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-            /* Tricolor Gradient */
-            background: linear-gradient(to bottom, 
-                #FF9933 33%, 
-                #FFFFFF 33%, #FFFFFF 66%, 
-                #138808 66%
-            );
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            border: 1px solid #ddd; border-radius: 4px; box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            background: linear-gradient(to bottom, #FF9933 33%, #FFFFFF 33%, #FFFFFF 66%, #138808 66%);
+            display: flex; justify-content: center; align-items: center;
         }
+        .india-flag-icon::after { content: '☸'; color: #000080; font-size: 20px; line-height: 0; margin-top: -1px; }
+        .emerald-icon { background-color: var(--emerald); border: 2px solid #fff; border-radius: 50%; box-shadow: 0 4px 10px rgba(29, 185, 84, 0.4); }
+
+        /* --- MODALS --- */
+        #welcome-modal, #article-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 2000; display: flex; justify-content: center; align-items: center; }
+        #welcome-modal { background: rgba(10, 26, 47, 0.85); transition: opacity 0.5s ease; }
+        #article-modal { background: rgba(10, 26, 47, 0.9); z-index: 2001; display: none; backdrop-filter: blur(5px); }
         
-        .india-flag-icon::after {
-            content: '☸'; 
-            color: #000080; 
-            font-size: 20px;
-            line-height: 0;
-            margin-top: -1px; 
-        }
-
-        .emerald-icon {
-            background-color: var(--emerald);
-            border: 2px solid #fff;
-            border-radius: 50%;
-            box-shadow: 0 4px 10px rgba(29, 185, 84, 0.4);
-        }
-
-        .contact-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 40px;
-        }
-
-        /* --- MODAL / POPUP --- */
-        #welcome-modal {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(10, 26, 47, 0.85);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 2000;
-            opacity: 1;
-            transition: opacity 0.5s ease;
-        }
-
-        .modal-content {
-            background: var(--white);
-            padding: 40px;
-            border-radius: 8px;
-            text-align: center;
-            max-width: 400px;
-            width: 90%;
-            position: relative;
-            border-top: 5px solid var(--emerald);
-        }
-
-        .modal-greeting {
-            font-size: 32px;
-            font-weight: 700;
-            color: var(--navy);
-            margin-bottom: 10px;
-        }
-
-        .modal-close {
-            position: absolute;
-            top: 10px;
-            right: 15px;
-            font-size: 24px;
-            cursor: pointer;
-            color: var(--slate);
-        }
-
-        /* --- ARTICLE MODAL --- */
-        #article-modal {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(10, 26, 47, 0.9);
-            z-index: 2001; 
-            display: none; justify-content: center; align-items: center;
-            backdrop-filter: blur(5px);
-        }
-
-        .article-content {
-            background: var(--white);
-            width: 90%; max-width: 800px;
-            max-height: 90vh;
-            overflow-y: auto;
-            padding: 50px;
-            border-radius: 8px;
-            position: relative;
-            color: var(--navy);
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-        }
-
-        .article-body h2 { 
-            font-size: 2rem; 
-            margin-bottom: 10px; 
-            color: var(--navy); 
-            line-height: 1.2;
-        }
+        .modal-content, .article-content { background: var(--white); border-radius: 8px; position: relative; }
+        .modal-content { padding: 40px; text-align: center; max-width: 400px; width: 90%; border-top: 5px solid var(--emerald); }
+        .article-content { width: 90%; max-width: 800px; max-height: 90vh; overflow-y: auto; padding: 50px; color: var(--navy); box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
         
-        .article-body h3 { 
-            margin-top: 30px; 
-            margin-bottom: 15px; 
-            font-size: 1.3rem; 
-            color: var(--emerald);
-        }
-        
-        .article-body p { margin-bottom: 15px; text-align: justify; color: #444; }
-        .article-body ul { list-style: disc; margin-left: 25px; margin-bottom: 15px; color: #444; }
-        .article-body li { margin-bottom: 8px; }
+        .modal-greeting { font-size: 32px; font-weight: 700; color: var(--navy); margin-bottom: 10px; }
+        .modal-close { position: absolute; top: 10px; right: 15px; font-size: 24px; cursor: pointer; color: var(--slate); }
 
-        /* --- FOOTER --- */
-        footer {
-            background-color: var(--navy);
-            color: var(--slate);
-            padding: 20px 0;
-            text-align: center;
-            font-family: var(--font-code);
-            font-size: 13px;
+        /* --- CV TEMPLATE (HIDDEN INITIALLY) --- */
+        #cv-template {
+            display: none; 
+            width: 800px;
+            font-family: 'Roboto', sans-serif; 
+            color: #333; 
+            background: #fff; 
+            padding: 40px; 
+            line-height: 1.5; 
         }
+        #cv-template h1 { color: var(--navy); margin-bottom: 5px; font-family: 'Poppins', sans-serif; }
+        #cv-template h2 { color: var(--emerald); font-size: 18px; margin-bottom: 20px; font-family: 'Fira Code', monospace; }
+        #cv-template h3 { background: var(--navy); color: #fff; padding: 5px 10px; font-size: 16px; margin-top: 25px; margin-bottom: 15px; font-family: 'Poppins', sans-serif; }
+        #cv-template p { font-size: 14px; margin-bottom: 10px; }
+        #cv-template ul { list-style: none; margin: 0; padding: 0; }
+        #cv-template li { font-size: 14px; margin-bottom: 8px; border-bottom: 1px solid #eee; padding-bottom: 5px; }
+        .cv-watermark { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-45deg); font-size: 80px; color: rgba(0,0,0,0.05); font-weight: bold; pointer-events: none; z-index: 0; white-space: nowrap; }
 
-        /* --- RESPONSIVE --- */
+        footer { background-color: var(--navy); color: var(--slate); padding: 20px 0; text-align: center; font-family: var(--font-code); font-size: 13px; }
+
         @media (max-width: 768px) {
             .mobile-toggle { display: block; }
-            
-            .nav-links {
-                position: fixed;
-                top: 0; 
-                /* 10. Mobile Menu Security Fallback */
-                right: -100%;
-                height: 100vh;
-                width: 70%;
-                background: var(--navy-light);
-                flex-direction: column;
-                justify-content: center;
-                transition: 0.3s;
-                box-shadow: -5px 0 15px rgba(0,0,0,0.3);
-            }
-
+            .nav-links { position: fixed; top: 0; right: -100%; height: 100vh; width: 70%; background: var(--navy-light); flex-direction: column; justify-content: center; transition: 0.3s; box-shadow: -5px 0 15px rgba(0,0,0,0.3); }
             .nav-links.active { right: 0; }
             .project-card { grid-template-columns: 1fr; }
             .project-img { margin-bottom: 20px; }
-            .project-desc-box { background: #fff; color: var(--navy); border: 1px solid var(--gray); }
             .contact-grid { grid-template-columns: 1fr; }
             .hero-title { font-size: 40px; }
-            .section-title::after { width: 100px; }
             .article-content { padding: 30px; }
-            .article-body h2 { font-size: 1.6rem; }
         }
     </style>
 </head>
@@ -581,7 +229,6 @@
     <!-- 11. WELCOME POPUP -->
     <div id="welcome-modal">
         <div class="modal-content">
-            <!-- 3. Security: Replaced inline onclick with ID for JS listener -->
             <span class="modal-close" id="modal-close-x">&times;</span>
             <div id="greeting-text" class="modal-greeting">Welcome</div>
             <p>Welcome to GeoSpatial Insights Lab. Exploring GIS, Remote Sensing, and GeoAI.</p>
@@ -590,14 +237,207 @@
         </div>
     </div>
 
-    <!-- ARTICLE MODAL (Hidden by default) -->
+    <!-- ARTICLE MODAL -->
     <div id="article-modal">
         <div class="article-content">
             <span class="modal-close" id="article-close-x">&times;</span>
             <div class="article-body">
                 <h2>Bridging GeoAI and Earth Science: My Journey and Vision</h2>
                 <p style="font-family: var(--font-code); font-size: 13px; color: var(--slate); margin-bottom: 25px;">Key Initiative | Sudip Mandal</p>
+                <div id="article-dynamic-content"></div>
+                <br>
+                <button class="btn btn-primary" id="article-close-btn">Close Article</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- CV TEMPLATE -->
+    <div id="cv-template">
+        <div class="cv-watermark">GEOSPATIAL INSIGHTS</div>
+        <h1 id="cv-name"></h1>
+        <h2 id="cv-tagline"></h2>
+        <div style="margin-bottom: 20px; font-size: 13px; color: #555;">
+            <span id="cv-email"></span> | <span id="cv-location"></span>
+        </div>
+        <h3>Profile</h3>
+        <p id="cv-about"></p>
+        <h3>Technical Skills</h3>
+        <ul id="cv-skills"></ul>
+        <h3>Courses & Certifications</h3>
+        <ul id="cv-courses"></ul>
+        <h3>Featured Projects</h3>
+        <ul id="cv-projects"></ul>
+        <div style="margin-top: 40px; border-top: 1px solid #ddd; padding-top: 10px; font-size: 11px; color: #777; text-align: center;">
+            Generated from GeoSpatial Insights Lab Portfolio | Protected Document
+        </div>
+    </div>
+
+    <!-- NAVIGATION -->
+    <header>
+        <div class="container">
+            <nav>
+                <div class="logo">GEOSPATIALINSIGHTS</div>
+                <div class="mobile-toggle" id="mobile-toggle-btn"><i data-lucide="menu"></i></div>
+                <ul class="nav-links" id="navLinks">
+                    <li><a href="#about" class="nav-item">About</a></li>
+                    <li><a href="#skills" class="nav-item">Skills</a></li>
+                    <li><a href="#courses" class="nav-item">Courses</a></li>
+                    <li><a href="#projects" class="nav-item">Projects</a></li>
+                    <li><a href="#resources" class="nav-item">Resources</a></li>
+                    <li><a href="#contact" class="nav-item">Contact</a></li>
+                    <li><a href="#" class="btn btn-primary" id="download-cv-btn" style="margin-left: 10px;">Download CV</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <!-- HERO SECTION -->
+        <section id="hero">
+            <div class="container hero-content">
+                <span class="hero-pre">Hi, my name is</span>
+                <h1 class="hero-title" id="hero-name"></h1>
+                <h2 class="hero-subtitle" id="hero-tagline"></h2>
+                <p class="hero-desc" id="hero-desc"></p>
+                <a href="#projects" class="btn btn-primary">My Work</a>
+                <a href="#contact" class="btn btn-filled">Contact Me</a>
+            </div>
+        </section>
+
+        <!-- ABOUT SECTION -->
+        <section id="about" class="section-padding">
+            <div class="container">
+                <h2 class="section-title">About Me</h2>
+                <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 40px;">
+                    <div id="about-text"></div>
+                    <div style="position: relative;">
+                         <img src="./WhatsApp Image 2025-11-28 at 9.27.31 PM.jpeg" alt="Sudip Mandal" 
+                              style="width: 100%; height: auto; border-radius: 8px; border: 3px solid var(--emerald); box-shadow: 0 10px 30px rgba(0,0,0,0.2);">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SKILLS SECTION -->
+        <section id="skills" class="section-padding" style="background-color: #fafafa;">
+            <div class="container">
+                <h2 class="section-title">Technical Skills</h2>
+                <div class="skills-grid" id="skills-grid"></div>
+            </div>
+        </section>
+
+        <!-- COURSES SECTION -->
+        <section id="courses" class="section-padding">
+            <div class="container">
+                <h2 class="section-title">Courses & Certifications</h2>
+                <div class="cert-grid" id="cert-grid"></div>
+            </div>
+        </section>
+
+        <!-- PROJECTS SECTION -->
+        <section id="projects" class="section-padding" style="background-color: #fafafa;">
+            <div class="container">
+                <h2 class="section-title">Featured Projects</h2>
+                <div id="projects-grid"></div>
+            </div>
+        </section>
+
+        <!-- RESOURCES SECTION -->
+        <section id="resources" class="section-padding">
+            <div class="container">
+                <h2 class="section-title">Resources & Downloads</h2>
+                <div class="resources-grid" id="resources-grid"></div>
+            </div>
+        </section>
+
+        <!-- CONTACT SECTION -->
+        <section id="contact" class="section-padding" style="background-color: #fafafa;">
+            <div class="container">
+                <h2 class="section-title">Get In Touch</h2>
+                <div class="contact-grid">
+                    <div>
+                        <h3 style="font-size: 40px; margin-bottom: 20px;">Let's Map the Future.</h3>
+                        <p style="margin-bottom: 30px; color: var(--slate);">Based in <strong>Kolkata, West Bengal</strong>. Open to collaborative projects.</p>
+                        <a id="contact-email" href="" class="btn btn-filled" style="margin-bottom: 30px;">Say Hello</a>
+                        <div style="display: flex; gap: 20px; margin-top: 20px;">
+                            <a href="#" class="text-emerald"><i data-lucide="github"></i></a>
+                            <a href="#" class="text-emerald"><i data-lucide="linkedin"></i></a>
+                            <a href="#" class="text-emerald"><i data-lucide="mail"></i></a>
+                        </div>
+                    </div>
+                    <div>
+                        <p style="font-family: var(--font-code); font-size: 12px; margin-bottom: 5px;">CURRENT LOCATION: KOLKATA (Approximate)</p>
+                        <div id="map-container"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>Designed & Built by Sudip Mandal | GeoSpatial Insights Lab</p>
+            <p style="opacity: 0.6; margin-top: 5px;"><span style="color: var(--emerald);">v1.7 (Fixed PDF & Images)</span></p>
+        </div>
+    </footer>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin="anonymous"></script>
+
+    <script>
+        // =========================================================
+        // 1. CENTRAL DATA SOURCE (Edit this to update Site & CV)
+        // =========================================================
+        const portfolioData = {
+            personal: {
+                name: "Sudip Mandal",
+                tagline: "GeoSpatial Insights Lab | GIS • Remote Sensing • GeoAI",
+                heroDesc: "A clean space showcasing my work in GIS, Remote Sensing, GeoAI, and geospatial analysis",
+                email: "sudipmandal09@zohomail.in",
+                location: "Kolkata, West Bengal",
+                about: `I am a Geography student passionate about GIS, Remote Sensing, AI, and GeoAI. I specialize in working with spatial data, satellite imagery, and geospatial technologies to understand patterns, solve problems, and create intelligent solutions.
                 
+                My interests include geospatial analysis, Earth observation, machine learning, and building tools that combine geography with modern technology. I enjoy learning new skills, experimenting with data, and developing projects that connect maps, coding, and real-world applications.`
+            },
+            skills: [
+                { icon: "globe", title: "GIS & Mapping", desc: "Spatial Analysis, Vector/Raster Data, Cartography, Projections", tags: ["QGIS", "ArcGIS", "Cartography"] },
+                { icon: "satellite", title: "Remote Sensing", desc: "Image Correction, Classification, Change Detection, Thermal RS", tags: ["Sentinel", "Landsat", "LiDAR"] },
+                { icon: "layers", title: "Software", desc: "Industry standard geospatial software packages", tags: ["QGIS", "ArcGIS Pro", "GEE", "SNAP"] },
+                { icon: "code", title: "Coding & Geo-Comp", desc: "Automating workflows and spatial data science", tags: ["Python", "GDAL", "Rasterio", "WebGIS"] },
+                { icon: "sprout", title: "Applications", desc: "Real-world environmental problem solving", tags: ["Forestry", "Urban Heat", "Water Res"] }
+            ],
+            courses: [
+                { issuer: "IIRS, ISRO", title: "Overview of GIS", skills: "Basics of GIS, Spatial Data, Map Projections" },
+                { issuer: "IIRS, ISRO", title: "RS & GIS in Natural Resource Mgmt", skills: "LULC Classification, Satellite Interpretation" },
+                { issuer: "IIRS, ISRO", title: "Laser Remote Sensing (Forests)", skills: "LiDAR Fundamentals, Point Cloud, Biomass" },
+                { issuer: "IIRS, ISRO", title: "Thermal Infrared RS (Ecology)", skills: "Surface Temp, Heat-Flux, Urban Heat Islands" },
+                { issuer: "IIRS, ISRO", title: "Geocomputation & Geo-web Services", skills: "WebGIS, OGC Services, Cloud GIS Basics" },
+                { issuer: "NASA ARSET", title: "Fundamentals of Remote Sensing", skills: "Sensor Types (Optical, Radar), Big Earth Data" }
+            ],
+            projects: [
+                { 
+                    title: "Bridging GeoAI and Earth Science: My Journey and Vision",
+                    category: "Key Initiative",
+                    desc: "A comprehensive record of my learning journey specializing in the integration of GIS, Remote Sensing, and Artificial Intelligence.",
+                    tags: ["Deep Learning", "Earth Observation", "Sustainability"],
+                    hasStory: true,
+                    imageUrl: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&q=80"
+                },
+                { 
+                    title: "Urban Heat Island Prediction",
+                    category: "Urban Planning",
+                    desc: "A machine learning model trained on Landsat 8 thermal bands to predict urban heat islands in rapidly developing cities.",
+                    tags: ["Random Forest", "Landsat 8", "GEE"],
+                    hasStory: false,
+                    isRightAligned: true
+                }
+            ],
+            resources: [
+                { icon: "file-text", title: "Project Presentation", desc: "Bridging GeoAI & Earth Science (PPT)" },
+                { icon: "file", title: "Research Abstract", desc: "NDVI Analysis Report (PDF)" },
+                { icon: "download", title: "Curriculum Vitae", desc: "Updated CV - Sudip Mandal" }
+            ],
+            articleContent: `
                 <h3>Introduction</h3>
                 <p>I am a geography student specialising in the integration of GIS, Remote Sensing, and Artificial Intelligence—an area increasingly recognised as the backbone of modern spatial decision-making. My work revolves around how satellite data, spatial analytics, and machine learning combine to provide insight into real-world environmental and developmental challenges. This space serves as a record of my learning journey, a platform for sharing insights, and a hub for demonstrating how geospatial technology supports research, industry, and policy.</p>
                 
@@ -627,434 +467,240 @@
                 
                 <h3>Conclusion</h3>
                 <p>This platform reflects my academic growth and professional aspirations in the geospatial domain. It's a site where learning meets application, and where I hope to connect with researchers, institutions, and organisations working toward geospatial innovation and sustainable development.</p>
-                
-                <br>
-                <button class="btn btn-primary" id="article-close-btn">Close Article</button>
-            </div>
-        </div>
-    </div>
+            `
+        };
 
-    <!-- NAVIGATION -->
-    <header>
-        <div class="container">
-            <nav>
-                <div class="logo">GEOSPATIALINSIGHTS</div>
-                <div class="mobile-toggle" id="mobile-toggle-btn">
-                    <i data-lucide="menu"></i>
-                </div>
-                <ul class="nav-links" id="navLinks">
-                    <!-- 3. Security: Removed inline onclicks -->
-                    <li><a href="#about" class="nav-item">About</a></li>
-                    <li><a href="#skills" class="nav-item">Skills</a></li>
-                    <li><a href="#projects" class="nav-item">Projects</a></li>
-                    <li><a href="#resources" class="nav-item">Resources</a></li>
-                    <li><a href="#contact" class="nav-item">Contact</a></li>
-                    <li><a href="#" class="btn btn-primary" style="margin-left: 10px;">Download CV</a></li>
-                </ul>
-            </nav>
-        </div>
-    </header>
-
-    <main>
-        <!-- 6. HERO SECTION -->
-        <section id="hero">
-            <div class="container hero-content">
-                <span class="hero-pre">Hi, my name is</span>
-                <h1 class="hero-title">Sudip Mandal.</h1>
-                <h2 class="hero-subtitle">GeoSpatial Insights Lab<br><span style="color:var(--emerald)">GIS • Remote Sensing • GeoAI</span></h2>
-                <p class="hero-desc">
-                    Integrating satellite data and machine learning to solve real-world environmental challenges.
-                </p>
-                <a href="#projects" class="btn btn-primary">My Work</a>
-                <a href="#contact" class="btn btn-filled">Contact Me</a>
-            </div>
-        </section>
-
-        <!-- ABOUT SECTION -->
-        <section id="about" class="section-padding">
-            <div class="container">
-                <h2 class="section-title">About Me</h2>
-                <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 40px;">
-                    <div>
-                        <p style="margin-bottom: 15px;">
-                            Hello! I am <strong>Sudip Mandal</strong>, the founder of the GeoSpatial Insights Lab. I operate at the intersection of 
-                            <span class="text-emerald">Earth Science</span> and <span class="text-emerald">Artificial Intelligence</span>.
-                        </p>
-                        <p style="margin-bottom: 15px;">
-                            Based in Kolkata, I specialize in processing large-scale satellite imagery to detect environmental changes. 
-                            My work focuses on bridging the gap between raw data and actionable insights using Python and Cloud Computing.
-                        </p>
-                        <p>Here are a few technologies I've been working with recently:</p>
+        // =========================================================
+        // 2. RENDER WEBSITE FROM DATA
+        // =========================================================
+        document.addEventListener('DOMContentLoaded', () => {
+            // Render Hero
+            document.getElementById('hero-name').textContent = portfolioData.personal.name;
+            document.getElementById('hero-tagline').innerHTML = "GeoSpatial Insights Lab<br><span style='color:var(--emerald)'>GIS • Remote Sensing • GeoAI</span>";
+            document.getElementById('hero-desc').textContent = portfolioData.personal.heroDesc;
+            
+            // Render About
+            const aboutParagraphs = portfolioData.personal.about.split('\n\n');
+            let aboutHtml = '';
+            aboutParagraphs.forEach(p => aboutHtml += `<p style="margin-bottom: 15px;">${p}</p>`);
+            aboutHtml += `<p>Here are a few technologies I've been working with recently:</p>
                         <ul class="skills-list" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; font-family: var(--font-code); font-size: 13px;">
                             <li><i data-lucide="chevron-right" size="14" style="display:inline; vertical-align:middle;"></i> Python (Rasterio/Geopandas)</li>
                             <li><i data-lucide="chevron-right" size="14" style="display:inline; vertical-align:middle;"></i> QGIS & ArcGIS Pro</li>
                             <li><i data-lucide="chevron-right" size="14" style="display:inline; vertical-align:middle;"></i> Google Earth Engine</li>
                             <li><i data-lucide="chevron-right" size="14" style="display:inline; vertical-align:middle;"></i> Machine Learning (Scikit)</li>
-                        </ul>
-                    </div>
-                    <div style="position: relative;">
-                         <!-- UPDATED OWNER IMAGE -->
-                         <img src="./WhatsApp Image 2025-11-28 at 9.27.31 PM.jpeg" 
-                              alt="Sudip Mandal" 
-                              style="width: 100%; height: auto; border-radius: 8px; border: 3px solid var(--emerald); box-shadow: 0 10px 30px rgba(0,0,0,0.2);">
-                    </div>
-                </div>
-            </div>
-        </section>
+                        </ul>`;
+            document.getElementById('about-text').innerHTML = aboutHtml;
 
-        <!-- SKILLS SECTION -->
-        <section id="skills" class="section-padding" style="background-color: #fafafa;">
-            <div class="container">
-                <h2 class="section-title">Technical Skills</h2>
-                <div class="skills-grid">
-                    <!-- GIS -->
+            // Render Contact Email
+            document.getElementById('contact-email').href = `mailto:${portfolioData.personal.email}`;
+
+            // Render Skills
+            const skillsContainer = document.getElementById('skills-grid');
+            portfolioData.skills.forEach(skill => {
+                let tagsHtml = skill.tags.map(t => `<span class="tag">${t}</span>`).join('');
+                skillsContainer.innerHTML += `
                     <div class="skill-card">
-                        <div class="skill-icon"><i data-lucide="globe"></i></div>
-                        <h3>GIS & Mapping</h3>
-                        <p>Proficient in cartography, spatial analysis, and vector data manipulation.</p>
-                        <div class="skill-tags">
-                            <span class="tag">QGIS</span>
-                            <span class="tag">ArcGIS Pro</span>
-                            <span class="tag">PostGIS</span>
-                        </div>
-                    </div>
-                    <!-- Remote Sensing -->
-                    <div class="skill-card">
-                        <div class="skill-icon"><i data-lucide="satellite"></i></div>
-                        <h3>Remote Sensing</h3>
-                        <p>Processing multispectral imagery, radiometric correction, and indices calculation.</p>
-                        <div class="skill-tags">
-                            <span class="tag">Sentinel-2</span>
-                            <span class="tag">Landsat</span>
-                            <span class="tag">ENVI</span>
-                        </div>
-                    </div>
-                    <!-- GeoAI -->
-                    <div class="skill-card">
-                        <div class="skill-icon"><i data-lucide="cpu"></i></div>
-                        <h3>GeoAI & ML</h3>
-                        <p>Applying machine learning algorithms to spatial data for classification and detection.</p>
-                        <div class="skill-tags">
-                            <span class="tag">Random Forest</span>
-                            <span class="tag">CNN</span>
-                            <span class="tag">PyTorch</span>
-                        </div>
-                    </div>
-                    <!-- Dev -->
-                    <div class="skill-card">
-                        <div class="skill-icon"><i data-lucide="code"></i></div>
-                        <h3>Development</h3>
-                        <p>Building web maps and automating geospatial workflows with code.</p>
-                        <div class="skill-tags">
-                            <span class="tag">Python</span>
-                            <span class="tag">GDAL</span>
-                            <span class="tag">Leaflet</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
+                        <div class="skill-icon"><i data-lucide="${skill.icon}"></i></div>
+                        <h3>${skill.title}</h3>
+                        <p>${skill.desc}</p>
+                        <div class="skill-tags">${tagsHtml}</div>
+                    </div>`;
+            });
 
-        <!-- PROJECTS SECTION -->
-        <section id="projects" class="section-padding">
-            <div class="container">
-                <h2 class="section-title">Featured Projects</h2>
+            // Render Courses
+            const certContainer = document.getElementById('cert-grid');
+            portfolioData.courses.forEach(course => {
+                certContainer.innerHTML += `
+                    <div class="cert-card">
+                        <div class="cert-issuer">${course.issuer}</div>
+                        <div class="cert-title">${course.title}</div>
+                        <div class="cert-skills">${course.skills}</div>
+                    </div>`;
+            });
 
-                <!-- Project 1: User Requested -->
-                <div class="project-card">
-                    <div class="project-img">
-                         <div style="background: #ddd; height: 300px; display: flex; align-items: center; justify-content: center;">
-                            <span style="color: #666; font-family: var(--font-code);">[GeoAI Vision Image]</span>
-                         </div>
-                    </div>
-                    <div class="project-content">
-                        <span class="project-overline">Key Initiative</span>
-                        <h3 class="project-title">Bridging GeoAI and Earth Science: My Journey and Vision</h3>
-                        <div class="project-desc-box">
-                            A comprehensive record of my learning journey specializing in the integration of GIS, Remote Sensing, and Artificial Intelligence. Explores how satellite data and ML combine to solve environmental challenges.
-                        </div>
-                        <div class="project-tech">
-                            <span>Deep Learning</span>
-                            <span>Earth Observation</span>
-                            <span>Sustainability</span>
-                        </div>
-                        <div>
-                            <!-- UPDATED: Button now opens the modal via JS ID -->
-                            <button class="btn btn-primary" id="read-story-btn" title="Read Article"><i data-lucide="book-open"></i> Read Full Story</button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Project 2 (Existing) -->
-                <div class="project-card" style="direction: rtl;">
-                    <div class="project-img">
-                         <div style="background: #ddd; height: 300px; display: flex; align-items: center; justify-content: center;">
-                            <span style="color: #666; font-family: var(--font-code);">[Urban Heat Island Map]</span>
-                         </div>
-                    </div>
-                    <div class="project-content" style="direction: ltr; text-align: left;">
-                        <span class="project-overline">Urban Planning</span>
-                        <h3 class="project-title">Urban Heat Island Prediction</h3>
-                        <div class="project-desc-box">
-                            A machine learning model trained on Landsat 8 thermal bands to predict urban heat islands in rapidly developing cities.
-                        </div>
-                        <div class="project-tech">
-                            <span>Random Forest</span>
-                            <span>Landsat 8</span>
-                            <span>Google Earth Engine</span>
-                        </div>
-                        <div>
-                            <a href="#" class="btn btn-primary" title="View Code"><i data-lucide="github"></i></a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- RESOURCES SECTION (NEW FOR PDF/PPT) -->
-        <section id="resources" class="section-padding" style="background-color: #fafafa;">
-            <div class="container">
-                <h2 class="section-title">Resources & Downloads</h2>
-                <p style="margin-bottom: 30px; color: var(--slate);">Access my latest presentations, research papers, and technical guides.</p>
+            // Render Projects
+            const projContainer = document.getElementById('projects-grid');
+            portfolioData.projects.forEach(proj => {
+                let style = proj.isRightAligned ? 'style="direction: rtl;"' : '';
+                let contentStyle = proj.isRightAligned ? 'style="direction: ltr; text-align: left;"' : '';
+                let tagsHtml = proj.tags.map(t => `<span>${t}</span>`).join('');
+                let btnHtml = proj.hasStory ? 
+                    `<button class="btn btn-primary" onclick="openArticleModal()" title="Read Article"><i data-lucide="book-open"></i> Read Full Story</button>` : 
+                    `<a href="#" class="btn btn-primary" title="View Code"><i data-lucide="github"></i></a>`;
                 
-                <div class="resources-grid">
-                    <!-- Resource 1 -->
-                    <div class="resource-card">
-                        <div style="color: var(--emerald); margin-bottom: 10px;"><i data-lucide="file-text" size="40"></i></div>
-                        <h4>Project Presentation</h4>
-                        <p style="font-size: 13px; color: #666; margin-bottom: 15px;">Bridging GeoAI & Earth Science (PPT)</p>
-                        <a href="#" class="btn btn-primary" style="font-size: 12px;">Download PPT</a>
-                    </div>
+                // Image Logic: Use provided URL or fallback placeholder
+                let imgContent;
+                if (proj.imageUrl) {
+                    imgContent = `<img src="${proj.imageUrl}" alt="${proj.title}" style="width: 100%; height: 100%; object-fit: cover;">`;
+                } else {
+                    imgContent = `<div style="background: #ddd; height: 300px; display: flex; align-items: center; justify-content: center;">
+                                    <span style="color: #666; font-family: var(--font-code);">[${proj.title} Image]</span>
+                                  </div>`;
+                }
 
-                    <!-- Resource 2 -->
-                    <div class="resource-card">
-                        <div style="color: var(--emerald); margin-bottom: 10px;"><i data-lucide="file" size="40"></i></div>
-                        <h4>Research Abstract</h4>
-                        <p style="font-size: 13px; color: #666; margin-bottom: 15px;">NDVI Analysis Report (PDF)</p>
-                        <a href="#" class="btn btn-primary" style="font-size: 12px;">Download PDF</a>
-                    </div>
-
-                    <!-- Resource 3 -->
-                    <div class="resource-card">
-                        <div style="color: var(--emerald); margin-bottom: 10px;"><i data-lucide="download" size="40"></i></div>
-                        <h4>Curriculum Vitae</h4>
-                        <p style="font-size: 13px; color: #666; margin-bottom: 15px;">Updated CV - Sudip Mandal</p>
-                        <a href="#" class="btn btn-primary" style="font-size: 12px;">Download CV</a>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- CONTACT & MAP -->
-        <section id="contact" class="section-padding">
-            <div class="container">
-                <h2 class="section-title">Get In Touch</h2>
-                
-                <div class="contact-grid">
-                    <div>
-                        <h3 style="font-size: 40px; margin-bottom: 20px;">Let's Map the Future.</h3>
-                        <p style="margin-bottom: 30px; color: var(--slate);">
-                            Based in <strong>Kolkata, West Bengal</strong>.
-                            I am currently open to collaborative projects in GIS and GeoAI. 
-                        </p>
-                        <a href="mailto:email@example.com" class="btn btn-filled" style="margin-bottom: 30px;">Say Hello</a>
-                        
-                        <!-- Socials -->
-                        <div style="display: flex; gap: 20px; margin-top: 20px;">
-                            <a href="#" class="text-emerald" title="GitHub"><i data-lucide="github"></i></a>
-                            <a href="#" class="text-emerald" title="LinkedIn"><i data-lucide="linkedin"></i></a>
-                            <a href="#" class="text-emerald" title="Email"><i data-lucide="mail"></i></a>
+                projContainer.innerHTML += `
+                    <div class="project-card" ${style}>
+                        <div class="project-img">
+                             ${imgContent}
                         </div>
-                    </div>
-                    
-                    <!-- MAP -->
-                    <div>
-                        <p style="font-family: var(--font-code); font-size: 12px; margin-bottom: 5px;">CURRENT LOCATION: KOLKATA (Approximate)</p>
-                        <div id="map-container"></div>
-                    </div>
-                </div>
-            </div>
-        </section>
+                        <div class="project-content" ${contentStyle}>
+                            <span class="project-overline">${proj.category}</span>
+                            <h3 class="project-title">${proj.title}</h3>
+                            <div class="project-desc-box">${proj.desc}</div>
+                            <div class="project-tech">${tagsHtml}</div>
+                            <div>${btnHtml}</div>
+                        </div>
+                    </div>`;
+            });
 
-    </main>
+            // Render Resources
+            const resContainer = document.getElementById('resources-grid');
+            portfolioData.resources.forEach(res => {
+                resContainer.innerHTML += `
+                    <div class="resource-card">
+                        <div style="color: var(--emerald); margin-bottom: 10px;"><i data-lucide="${res.icon}" size="40"></i></div>
+                        <h4>${res.title}</h4>
+                        <p style="font-size: 13px; color: #666; margin-bottom: 15px;">${res.desc}</p>
+                        <a href="#" class="btn btn-primary" style="font-size: 12px;">Download</a>
+                    </div>`;
+            });
 
-    <!-- FOOTER -->
-    <footer>
-        <div class="container">
-            <p>Designed & Built by Sudip Mandal | GeoSpatial Insights Lab</p>
-            <p style="opacity: 0.6; margin-top: 5px;">
-                <span style="color: var(--emerald);">v1.4</span>
-            </p>
-        </div>
-    </footer>
+            // Article Content
+            document.getElementById('article-dynamic-content').innerHTML = portfolioData.articleContent;
 
-    <!-- 1. SRI: Leaflet JS with integrity -->
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin="anonymous"></script>
-
-    <script>
-        // --- 15. SEPARATION OF CONCERNS (RECOMMENDED) ---
-        // Ideally, this script block should be in a separate 'assets/js/main.js' file.
-        // For this single-file deliverable, it remains here.
-
-        document.addEventListener('DOMContentLoaded', () => {
-            
-            // --- ICONS INITIALIZATION ---
+            // Re-run Icons
             lucide.createIcons();
-
-            // --- 2. SECURITY: SAFE EVENT LISTENERS (No Inline Handlers) ---
             
-            // Mobile Menu Logic
+            // --- EVENT LISTENERS ---
+            setupEventListeners();
+        });
+
+        // =========================================================
+        // 3. GENERATE CV FROM DATA (UPDATED TO FIX BLANK PDF)
+        // =========================================================
+        function generateCV() {
+            // Populate CV Template from Data Object
+            document.getElementById('cv-name').textContent = portfolioData.personal.name;
+            document.getElementById('cv-tagline').textContent = portfolioData.personal.tagline;
+            document.getElementById('cv-email').textContent = portfolioData.personal.email;
+            document.getElementById('cv-location').textContent = portfolioData.personal.location;
+            document.getElementById('cv-about').textContent = portfolioData.personal.about; // Plain text for CV
+
+            // CV Skills
+            let skillsHtml = '';
+            portfolioData.skills.forEach(s => skillsHtml += `<li><strong>${s.title}:</strong> ${s.desc}</li>`);
+            document.getElementById('cv-skills').innerHTML = skillsHtml;
+
+            // CV Courses
+            let coursesHtml = '';
+            portfolioData.courses.forEach(c => coursesHtml += `<li><strong>${c.title}</strong> (${c.issuer}) - ${c.skills}</li>`);
+            document.getElementById('cv-courses').innerHTML = coursesHtml;
+
+            // CV Projects
+            let projHtml = '';
+            portfolioData.projects.forEach(p => projHtml += `<li><strong>${p.title}:</strong> ${p.desc}</li>`);
+            document.getElementById('cv-projects').innerHTML = projHtml;
+
+            // Generate PDF
+            const element = document.getElementById('cv-template');
+            
+            // Fix for blank PDF: Make element temporarily visible on top
+            element.style.display = 'block';
+            element.style.position = 'absolute';
+            element.style.left = '0';
+            element.style.top = '0';
+            element.style.zIndex = '9999';
+
+            const opt = {
+                margin:       0.5,
+                filename:     'Sudip_Mandal_CV.pdf',
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2 },
+                jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' }
+            };
+
+            html2pdf().set(opt).from(element).save().then(function() {
+                // Hide again after download
+                element.style.display = 'none';
+            });
+        }
+
+        function setupEventListeners() {
+            // Mobile Menu
             const mobileToggle = document.getElementById('mobile-toggle-btn');
             const navLinks = document.getElementById('navLinks');
             const navItems = document.querySelectorAll('.nav-item');
-
-            function toggleMenu() {
-                navLinks.classList.toggle('active');
-            }
-
+            function toggleMenu() { navLinks.classList.toggle('active'); }
             if(mobileToggle) mobileToggle.addEventListener('click', toggleMenu);
-            // Close menu when clicking a link
-            navItems.forEach(item => {
-                item.addEventListener('click', () => {
-                    if(navLinks.classList.contains('active')) toggleMenu();
-                });
-            });
+            navItems.forEach(item => item.addEventListener('click', () => { if(navLinks.classList.contains('active')) toggleMenu(); }));
 
-
-            // --- WELCOME MODAL LOGIC ---
+            // Welcome Modal
             const welcomeModal = document.getElementById('welcome-modal');
             const modalEnterBtn = document.getElementById('modal-enter-btn');
             const modalCloseX = document.getElementById('modal-close-x');
             const greetingElement = document.getElementById('greeting-text');
-
-            // 4. Input Sanitization: Avoiding innerHTML unless controlled
-            if (greetingElement) {
-                 // Using innerHTML here for styling bullets, but content is static and controlled.
-                 greetingElement.innerHTML = "Welcome <span style='color:var(--emerald)'>&bull;</span> नमस्ते <span style='color:var(--emerald)'>&bull;</span> নমস্কার";
-            }
-
+            if (greetingElement) greetingElement.innerHTML = "Welcome <span style='color:var(--emerald)'>&bull;</span> नमस्ते <span style='color:var(--emerald)'>&bull;</span> নমস্কার";
+            
             function closeModal() {
                 welcomeModal.style.opacity = '0';
-                setTimeout(() => {
-                    welcomeModal.style.display = 'none';
-                    // Initialize map after modal closes to ensure correct rendering size
-                    initMap();
-                }, 500);
+                setTimeout(() => { welcomeModal.style.display = 'none'; initMap(); }, 500);
             }
-
             if(modalEnterBtn) modalEnterBtn.addEventListener('click', closeModal);
             if(modalCloseX) modalCloseX.addEventListener('click', closeModal);
 
-
-            // --- ARTICLE MODAL LOGIC ---
+            // Article Modal
             const articleModal = document.getElementById('article-modal');
-            const readStoryBtn = document.getElementById('read-story-btn');
             const articleCloseX = document.getElementById('article-close-x');
             const articleCloseBtn = document.getElementById('article-close-btn');
-
-            function openArticleModal() {
-                articleModal.style.display = 'flex';
-            }
-
-            function closeArticleModal() {
-                articleModal.style.display = 'none';
-            }
-
-            if(readStoryBtn) readStoryBtn.addEventListener('click', openArticleModal);
+            
+            window.openArticleModal = function() { articleModal.style.display = 'flex'; };
+            function closeArticleModal() { articleModal.style.display = 'none'; }
             if(articleCloseX) articleCloseX.addEventListener('click', closeArticleModal);
             if(articleCloseBtn) articleCloseBtn.addEventListener('click', closeArticleModal);
 
+            // CV Download
+            const downloadCvBtn = document.getElementById('download-cv-btn');
+            if(downloadCvBtn) {
+                downloadCvBtn.addEventListener('click', function(e) { e.preventDefault(); generateCV(); });
+            }
 
-            // --- PRIVACY: DISABLE SHORTCUTS & INSPECT ---
+            // Privacy
             document.addEventListener('contextmenu', event => event.preventDefault());
-
             document.addEventListener('keydown', function(e) {
-                // Block Ctrl+C (Copy), Ctrl+S (Save), Ctrl+U (Source), Ctrl+P (Print), F12 (DevTools)
-                if (
-                    (e.ctrlKey && (e.key === 'c' || e.key === 'C' || e.key === 's' || e.key === 'S' || e.key === 'u' || e.key === 'U' || e.key === 'p' || e.key === 'P')) ||
-                    e.key === 'F12'
-                ) {
-                    e.preventDefault();
-                    return false;
+                if ((e.ctrlKey && (e.key === 'c' || e.key === 'C' || e.key === 's' || e.key === 'S' || e.key === 'u' || e.key === 'U' || e.key === 'p' || e.key === 'P')) || e.key === 'F12') {
+                    e.preventDefault(); return false;
                 }
             });
+            document.addEventListener('copy', function(e) { e.preventDefault(); if (e.clipboardData) { e.clipboardData.setData('text/plain', ''); } });
 
-            // Fallback: Clear clipboard if copy succeeds
-            document.addEventListener('copy', function(e) {
-                e.preventDefault();
-                // Copy empty string or warning
-                if (e.clipboardData) {
-                    e.clipboardData.setData('text/plain', '');
-                }
-            });
-
-
-            // --- SCROLL ANIMATION ---
+            // Scroll Animation
             const observer = new IntersectionObserver((entries) => {
-                entries.forEach((entry) => {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add('show'); 
-                    }
-                });
+                entries.forEach((entry) => { if (entry.isIntersecting) { entry.target.classList.add('show'); } });
             });
-
-            const hiddenElements = document.querySelectorAll('.project-card, .skill-card, .resource-card');
-            hiddenElements.forEach((el) => observer.observe(el));
-        });
-
-
-        // --- LEAFLET MAP SETUP ---
-        function initMap() {
-            var kolkataCoords = [22.5726, 88.3639];
-            // Coordinates for Occupied Territories (Asserting Sovereignty)
-            var pokCoords = [35.8819, 74.4643]; // Gilgit-Baltistan (PoK)
-            var aksaiChinCoords = [35.1689, 79.3789]; // Aksai Chin (COK)
-
-            // Map Setup
-            var map = L.map('map-container').setView(kolkataCoords, 5);
-
-            // OpenStreetMap Layer
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '&copy; OpenStreetMap',
-                subdomains: 'abc',
-                maxZoom: 20
-            }).addTo(map);
-
-            // --- 1. YOUR LOCATION (KOLKATA) ---
-            var emeraldIcon = L.divIcon({
-                className: 'emerald-icon',
-                iconSize: [16, 16],
-                iconAnchor: [8, 8]
-            });
-
-            L.marker(kolkataCoords, { icon: emeraldIcon }).addTo(map)
-                .bindPopup('<b>Sudip Mandal</b><br>Kolkata, West Bengal<br>GeoSpatial Insights Lab')
-                .openPopup();
-
-            // Highlight Area
-            L.circle(kolkataCoords, {
-                color: '#1DB954',
-                fillColor: '#1DB954',
-                fillOpacity: 0.1,
-                radius: 15000 // 15km Radius
-            }).addTo(map);
-
-            // --- 2. TRICOLOR FLAGS IN OCCUPIED TERRITORIES ---
-            var flagIcon = L.divIcon({
-                className: 'india-flag-icon',
-                iconSize: [30, 20], // Width, Height
-                iconAnchor: [15, 10]
-            });
-
-            // PoK Flag
-            L.marker(pokCoords, { icon: flagIcon }).addTo(map)
-                .bindPopup('<b>Indian Territory (PoK)</b><br>Under Illegal Occupation');
-
-            // Aksai Chin Flag
-            L.marker(aksaiChinCoords, { icon: flagIcon }).addTo(map)
-                .bindPopup('<b>Indian Territory (COK)</b><br>Under Illegal Occupation');
+            setTimeout(() => {
+                const hiddenElements = document.querySelectorAll('.project-card, .skill-card, .resource-card, .cert-card');
+                hiddenElements.forEach((el) => observer.observe(el));
+            }, 500); // Wait for dynamic render
         }
 
+        // --- MAP SETUP ---
+        function initMap() {
+            var kolkataCoords = [22.5726, 88.3639];
+            var pokCoords = [35.8819, 74.4643]; 
+            var aksaiChinCoords = [35.1689, 79.3789];
+
+            var map = L.map('map-container').setView(kolkataCoords, 5);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '&copy; OpenStreetMap', subdomains: 'abc', maxZoom: 20 }).addTo(map);
+
+            var emeraldIcon = L.divIcon({ className: 'emerald-icon', iconSize: [16, 16], iconAnchor: [8, 8] });
+            L.marker(kolkataCoords, { icon: emeraldIcon }).addTo(map).bindPopup('<b>Sudip Mandal</b><br>Kolkata, West Bengal').openPopup();
+            L.circle(kolkataCoords, { color: '#1DB954', fillColor: '#1DB954', fillOpacity: 0.1, radius: 15000 }).addTo(map);
+
+            var flagIcon = L.divIcon({ className: 'india-flag-icon', iconSize: [30, 20], iconAnchor: [15, 10] });
+            L.marker(pokCoords, { icon: flagIcon }).addTo(map).bindPopup('<b>Indian Territory (PoK)</b><br>Under Illegal Occupation');
+            L.marker(aksaiChinCoords, { icon: flagIcon }).addTo(map).bindPopup('<b>Indian Territory (COK)</b><br>Under Illegal Occupation');
+        }
     </script>
 </body>
 </html>
